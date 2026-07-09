@@ -1,12 +1,3 @@
-// src/pages/rifa/[id].jsx
-//
-// Página de una rifa específica. Usa SSR (getServerSideProps) en lugar de
-// ISR a propósito: a diferencia de la landing, aquí el estado de los
-// boletos cambia constantemente (reservas en vivo), así que necesitamos
-// el dato más fresco posible en cada visita. La actualización *después*
-// de la carga inicial la maneja Cuadricula.jsx vía Supabase Realtime, sin
-// volver a golpear esta ruta.
-
 import Head from 'next/head';
 import { supabase } from '../../config/supabase';
 import Cuadricula from '../../components/Cuadricula';
@@ -14,7 +5,6 @@ import Cuadricula from '../../components/Cuadricula';
 export async function getServerSideProps({ params }) {
   const { id } = params;
 
-  // 1) Datos de la rifa: una sola fila, consulta muy liviana.
   const { data: rifa, error: errorRifa } = await supabase
     .from('rifas')
     .select('id, titulo, descripcion, precio_numero, imagen_url, fecha_sorteo, total_numeros, estado')
@@ -25,9 +15,6 @@ export async function getServerSideProps({ params }) {
     return { notFound: true };
   }
 
-  // 2) Boletos: pedimos ÚNICAMENTE `numero` y `estado` (2 columnas), nunca
-  // datos del comprador — eso reduce drásticamente el peso de traer hasta
-  // 10,000 filas en cada carga de página.
   const { data: boletos, error: errorBoletos } = await supabase
     .from('boletos')
     .select('numero, estado')
@@ -37,8 +24,6 @@ export async function getServerSideProps({ params }) {
     console.error('[rifa/[id]] Error cargando boletos:', errorBoletos.message);
   }
 
-  // Convertimos la lista a un array plano indexado 0..N-1. Así el cliente
-  // hace lecturas O(1) por índice en vez de buscar en un array de objetos.
   const estadoInicial = new Array(rifa.total_numeros).fill('disponible');
   (boletos ?? []).forEach((b) => {
     const idx = parseInt(b.numero, 10);
@@ -61,10 +46,10 @@ export default function PaginaRifa({ rifa, estadoInicial }) {
       <main className="pagina">
         <h1>{rifa.titulo}</h1>
         {rifa.descripcion && <p className="pagina__desc">{rifa.descripcion}</p>}
-        <p className="pagina__precio">Precio por número: ${rifa.precio_numero}</p>
+        <p className="pagina__precio">Precio por numero: ${rifa.precio_numero}</p>
 
         {rifa.estado !== 'activa' ? (
-          <p className="pagina__cerrada">Esta rifa ya no está activa.</p>
+          <p className="pagina__cerrada">Esta rifa ya no esta activa.</p>
         ) : (
           <Cuadricula
             rifaId={rifa.id}
