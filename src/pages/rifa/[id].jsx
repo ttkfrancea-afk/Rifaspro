@@ -95,3 +95,4 @@ export default function PaginaRifa({ rifa, estadoInicial }) {[span_73](start_spa
     </>
   );[span_94](start_span)[span_94](end_span)
 }[span_95](start_span)[span_95](end_span)
+
