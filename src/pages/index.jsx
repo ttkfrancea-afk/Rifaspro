@@ -1,8 +1,25 @@
+// src/pages/index.jsx
+//
+// Landing page. Carga las rifas activas con getServerSideProps: el HTML
+// llega ya listo desde el servidor (mejor SEO y "first paint" instantáneo,
+// sin spinners de carga en el cliente).
+//
+// Nota de arquitectura (rendimiento): esta lista cambia con poca frecuencia
+// (solo cuando el admin crea o cierra una rifa). Si en el futuro el
+// tráfico crece mucho, esta misma página es una candidata perfecta para
+// migrar a getStaticProps + { revalidate: 30 } (ISR): serviría desde caché
+// y se regeneraría en segundo plano cada 30s, quitando por completo esta
+// consulta del camino crítico de cada visita. Se deja con SSR tal como se
+// pidió, para garantizar siempre el dato más fresco.
+
 import Head from 'next/head';
 import { supabase } from '../config/supabase';
-import TarjetaRifa from '../components/TarjetaRifa'; 
+import TarjetaRifa from '../components/TarjetaRifa';
 
 export async function getServerSideProps() {
+  // Seleccionamos SOLO las columnas que la tarjeta necesita — nunca
+  // "select *" — para minimizar el tamaño de la respuesta y el trabajo
+  // que hace Postgres por cada request.
   const { data: rifas, error } = await supabase
     .from('rifas')
     .select('id, titulo, descripcion, precio_numero, imagen_url, fecha_sorteo, total_numeros, numeros_vendidos')
