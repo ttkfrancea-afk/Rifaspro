@@ -1,0 +1,147 @@
+/* src/styles/globals.css
+ *
+ * Sistema de diseño único para todo el proyecto. Todo color, sombra y curva
+ * de animación vive aquí como variable CSS — así "paleta dinámica" no es
+ * solo un adjetivo: cambiar un tono de marca es cambiar una línea aquí,
+ * no perseguir hex codes por 6 archivos.
+ *
+ * Dos sub-paletas a propósito:
+ *   --rosa-*   -> frontend público (la rifa de Ana Quintero: floral, cálido)
+ *   --admin-*  -> panel de administración (dashboard SaaS: neutro, denso)
+ * Un dashboard de operación y una invitación floral no deben verse igual;
+ * comparten el mismo MOTOR (variables, easing, utilidades), no el mismo tono.
+ */
+
+:root {
+  /* ---------- Paleta pública: floral / rosa antiguo ---------- */
+  --rosa-fondo: #fbf1ef;
+  --rosa-tarjeta: #fffbf9;
+  --rosa-principal: #c97b8c;
+  --rosa-suave: #f2d9de;
+  --rosa-borde: #e9cdd2;
+  --vino: #5b2333;
+  --vino-suave: #8a5563;
+  --dorado-rosa: #c9a876;
+  --dorado-rosa-oscuro: #a98850;
+  --verde-salvia: #6e9b7c;
+  --rojo-suave: #b1495a;
+
+  /* ---------- Paleta admin: dashboard SaaS ---------- */
+  --admin-fondo: #f4f3f1;
+  --admin-superficie: #ffffff;
+  --admin-tinta: #232733;
+  --admin-tinta-suave: #6b6f7a;
+  --admin-borde: #e3e0da;
+  --admin-verde: #1f8a55;
+  --admin-verde-bg: #e1f3e8;
+  --admin-rojo: #b1495a;
+  --admin-rojo-bg: #f7e3e5;
+  --admin-gris: #8a8f98;
+  --admin-gris-bg: #eceae6;
+  --admin-dorado: #c9a227;
+  --admin-dorado-bg: #f7edd2;
+
+  /* ---------- Tipografía ---------- */
+  /* --font-display la define next/font en _app.jsx (Playfair Display,
+     autohospedada — sin llamada externa a Google Fonts en cada visita). */
+  --fuente-display: 'Playfair Display', ui-serif, Georgia, serif;
+  --fuente-cuerpo: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fuente-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* ---------- Sombras (tono cálido, no gris genérico) ---------- */
+  --sombra-suave: 0 2px 10px rgba(91, 35, 51, 0.06);
+  --sombra-media: 0 12px 28px rgba(91, 35, 51, 0.14);
+  --sombra-fuerte: 0 20px 44px rgba(91, 35, 51, 0.2);
+  --sombra-admin: 0 1px 3px rgba(35, 39, 51, 0.08);
+  --sombra-admin-hover: 0 8px 20px rgba(35, 39, 51, 0.1);
+
+  /* ---------- Curvas de animación ---------- */
+  --resorte: cubic-bezier(0.34, 1.56, 0.64, 1); /* rebote sutil, tipo "spring" */
+  --suave: cubic-bezier(0.22, 1, 0.36, 1); /* deceleración elegante */
+}
+
+/* ============================================================
+   Reset base — mobile-first, sin nada que penalice gama baja
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente-cuerpo);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button, input {
+  font-family: inherit;
+}
+
+/* Foco visible siempre — accesibilidad de teclado, no negociable */
+:focus-visible {
+  outline: 2px solid var(--dorado-rosa-oscuro);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================================================
+   Utilidades de animación — mismas clases, reutilizables en
+   cualquier página. Transform/opacity solamente: es lo único
+   que un móvil de gama baja anima sin saltos ni recalentarse.
+   ============================================================ */
+
+/* Entrada suave al aparecer (tarjetas, filas de tabla, etc.) */
+@keyframes entrar-suave {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .u-entrada {
+    animation: entrar-suave 0.5s var(--suave) both;
+  }
+}
+
+/* Presión tipo resorte — para cualquier botón o celda clicable */
+.u-presion {
+  transition: transform 0.18s var(--resorte);
+}
+.u-presion:active {
+  transform: scale(0.94);
+}
+
+/* Elevación al pasar el mouse — tarjetas */
+.u-elevar {
+  transition: transform 0.25s var(--suave), box-shadow 0.25s var(--suave);
+}
+.u-elevar:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sombra-media);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .u-entrada, .u-presion, .u-elevar, .u-elevar:hover {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* La fuente llega via <link> en _document.jsx, la exponemos como clase
+   aplicada al div raiz en _app.jsx para que todos los descendientes
+   puedan usarla via font-family: 'Playfair Display', ... */
+.fuente-display-raiz {
+  /* este div es solo un contenedor sin estilos propios; las paginas
+     definen su propio <main> con padding y color */
+}
